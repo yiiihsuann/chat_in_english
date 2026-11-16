@@ -1,316 +1,52 @@
-const STORAGE_KEY = 'chat_in_english_api_key';
-const SETTINGS_KEY = 'chat_in_english_settings';
+# Chat in English — AI 英文會話練習
 
-const apiKeyInput = document.getElementById('apiKeyInput');
-const saveKeyBtn = document.getElementById('saveKeyBtn');
-const clearKeyBtn = document.getElementById('clearKeyBtn');
-const modelSelect = document.getElementById('modelSelect');
-const scenarioSelect = document.getElementById('scenarioSelect');
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
-const chatMessages = document.getElementById('chatMessages');
-const correctionBox = document.getElementById('correctionBox');
-const coachNote = document.getElementById('coachNote');
-const voiceBtn = document.getElementById('voiceBtn');
-const speakReplyBtn = document.getElementById('speakReplyBtn');
-const themeToggle = document.getElementById('themeToggle');
-const newChatBtn = document.getElementById('newChatBtn');
+一個簡單的英文會話練習網頁。選擇情境後，和 Gemini AI 練習對話；AI 會提供自然的英文回應、修正建議和簡短說明。可在 GitHub Pages 免費託管，學生各自使用自己的 Gemini API Key。
 
-const state = {
-  apiKey: localStorage.getItem(STORAGE_KEY) || '',
-  messages: [],
-  latestReply: '',
-  recognition: null,
-  isListening: false,
-};
+## 開始練習
 
-function setStatus(text) {
-  const existing = document.querySelector('.status');
-  if (existing) existing.remove();
+部署完成後，開啟：**https://yiiihsuann.github.io/chat_in_english/**
 
-  const status = document.createElement('div');
-  status.className = 'status';
-  status.innerHTML = '<span class="dot"></span><span>' + text + '</span>';
-  const chatPanel = document.querySelector('.chat-panel');
-  chatPanel.appendChild(status);
-}
+如果網址尚未開啟，請先照下方「部署到 GitHub Pages」設定；首次部署通常需要幾分鐘才會生效。
 
-function loadSettings() {
-  const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-  if (saved.model) modelSelect.value = saved.model;
-  if (saved.scenario) scenarioSelect.value = saved.scenario;
-  if (saved.theme === 'dark') document.body.classList.add('dark');
-  if (saved.theme === 'light') document.body.classList.remove('dark');
-}
+1. 到 [Google AI Studio](https://aistudio.google.com/app/apikey) 取得自己的 Gemini API Key。
+2. 開啟練習網站，把 Key 貼到頁面上方並按 **Save key**。
+3. 選一個角色扮演情境，例如餐廳、飯店或工作面試。
+4. 用英文打字或按麥克風說話，按 **Send** 開始練習。
+5. 右側可看英文修正和小提示。按 **Replay corrected sentence** 或對話旁的 **Listen** 重播句子。
+6. 用 **New chat** 開始新的對話；按 **Clear** 可從這個瀏覽器刪除已儲存的 Key。
 
-function saveSettings() {
-  const settings = {
-    model: modelSelect.value,
-    scenario: scenarioSelect.value,
-    theme: document.body.classList.contains('dark') ? 'dark' : 'light',
-  };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
+## 部署到 GitHub Pages
 
-function showApiKey() {
-  apiKeyInput.value = state.apiKey;
-}
+1. 前往此 repository 的 **Settings → Pages**。
+2. 在 **Build and deployment** 選 **Deploy from a branch**。
+3. Branch 選 **main**，資料夾選 **/ (root)**，再按 **Save**。
+4. 等 GitHub Pages 顯示已發布後，開啟上方網址。
 
-function saveApiKey() {
-  const key = apiKeyInput.value.trim();
-  state.apiKey = key;
-  if (key) {
-    localStorage.setItem(STORAGE_KEY, key);
-    setStatus('API key saved in your browser.');
-  } else {
-    localStorage.removeItem(STORAGE_KEY);
-    setStatus('API key cleared.');
-  }
-}
+若 Pages 設定中沒有可選的部署來源，請確認 repository 的可見度和 GitHub 帳號方案是否支援 Pages。私人 repository 的 Pages 權限可能受方案限制。
 
-function clearApiKey() {
-  state.apiKey = '';
-  apiKeyInput.value = '';
-  localStorage.removeItem(STORAGE_KEY);
-  setStatus('API key removed.');
-}
+## 功能
 
-function getScenarioPrompt(scenario) {
-  const base = `You are a friendly English conversation teacher and native-speaker coach. Keep the tone natural, encouraging, and helpful. Speak at a level that is suitable for learners. Do NOT sound robotic. `;
+- Gemini AI 英文對話與友善的英文修正
+- Everyday、餐廳、飯店入住、工作面試角色扮演
+- 每則 AI 回覆可單獨重播；修正句也可重播
+- 瀏覽器語音輸入與深色模式
+- API Key 由每位使用者自行提供，存在該瀏覽器的 `localStorage`
+- 手機與桌面版響應式介面
 
-  const scenarioConfig = {
-    'daily-life': 'Practice everyday conversations about school, work, family, hobbies, and social plans.',
-    'coffee-shop': 'Roleplay a barista and customer in a coffee shop conversation. Keep it practical and polite.',
-    'travel': 'Roleplay travel and airport situations, asking for directions, ordering food, and checking in.',
-    'job-interview': 'Roleplay a professional job interview. Encourage confidence and clear answers.',
-    'classroom': 'Roleplay classroom discussion and speaking practice in a university or language classroom.'
-  };
+## API Key 與隱私
 
-  return `${base}${scenarioConfig[scenario] || scenarioConfig['daily-life']}\n\nRespond in this format as valid JSON only:\n{\n  "response": "your natural reply to the user in English",\n  "correction": "the best corrected or more natural version of the user sentence or a useful phrase",\n  "coachNote": "a short explanation of grammar, tone, or usage"\n}`;
-}
+這是純前端網站，沒有自建後端。Key 不在程式碼或 GitHub repository 中，但會由使用者瀏覽器直接送到 Google Gemini API，並儲存在同一瀏覽器的 `localStorage`。請只在自己的裝置使用自己的 Key；不要共用或公開 Key。使用公用電腦後，請按 **Clear**。API 使用量及相關限制依 Google AI Studio 帳戶與方案為準。
 
-function parseModelResponse(rawText) {
-  const cleaned = rawText.trim();
-  const match = cleaned.match(/```json\s*([\s\S]*?)\s*```/i) || cleaned.match(/```\s*([\s\S]*?)\s*```/i);
-  const jsonText = match ? match[1] : cleaned;
+## 語音支援
 
-  try {
-    return JSON.parse(jsonText);
-  } catch (error) {
-    return {
-      response: rawText,
-      correction: 'Try again with a clearer sentence.',
-      coachNote: 'The model returned a plain response instead of structured JSON.'
-    };
-  }
-}
+語音輸入使用瀏覽器的 Web Speech API，支援情形會依瀏覽器、裝置和權限不同；請在安全的 HTTPS 網站並允許麥克風權限。若無法使用麥克風，可直接打字。AI 回覆朗讀使用瀏覽器內建語音合成功能。
 
-function buildPromptFromHistory() {
-  const context = state.messages.map((message) => `${message.role}: ${message.text}`).slice(-12).join('\n');
-  const userText = userInput.value.trim();
-  const fallback = userText || 'Please help me practice speaking English.';
-  return `Conversation context:\n${context}\n\nUser says: ${fallback}`;
-}
+## 本機預覽
 
-async function sendMessage() {
-  const text = userInput.value.trim();
-  if (!text) return;
+直接用瀏覽器開啟 `index.html` 通常可檢視介面；語音功能和 API 呼叫建議透過 HTTPS 網站（例如 GitHub Pages）使用。網站不需要建置步驟或安裝套件。
 
-  const apiKey = state.apiKey;
-  if (!apiKey) {
-    setStatus('Please add your Gemini API key first.');
-    apiKeyInput.focus();
-    return;
-  }
+## 專案檔案
 
-  const userMessage = { role: 'user', text };
-  state.messages.push(userMessage);
-  renderMessages();
-  userInput.value = '';
-  sendBtn.disabled = true;
-  setStatus('Sending to Gemini...');
-
-  const requestBody = {
-    system_instruction: {
-      parts: [{ text: getScenarioPrompt(scenarioSelect.value) }],
-    },
-    contents: [{
-      role: 'user',
-      parts: [{ text: buildPromptFromHistory() }],
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 500,
-    },
-  };
-
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${modelSelect.value}:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      }
-    );
-
-    const payload = await response.json();
-    if (!response.ok) {
-      throw new Error(payload?.error?.message || 'Gemini request failed.');
-    }
-
-    const rawText = payload?.candidates?.[0]?.content?.parts?.map((part) => part.text).join('') || '';
-    const data = parseModelResponse(rawText);
-    const aiText = data.response || 'I am ready to help you practice.';
-    const correctedText = data.correction || 'No correction generated.';
-    const coachText = data.coachNote || 'Keep practicing!';
-
-    state.messages.push({ role: 'ai', text: aiText });
-    state.latestReply = aiText;
-    correctionBox.textContent = correctedText;
-    correctionBox.classList.remove('empty-state');
-    coachNote.textContent = coachText;
-    coachNote.classList.remove('empty-state');
-    renderMessages();
-    setStatus('AI reply ready.');
-  } catch (error) {
-    const message = error.message || 'Unknown error';
-    state.messages.push({ role: 'ai', text: `Sorry, I couldn't generate a response. Error: ${message}` });
-    state.latestReply = `Sorry, I couldn't generate a response. Error: ${message}`;
-    renderMessages();
-    correctionBox.textContent = 'Please check your API key and model name.';
-    correctionBox.classList.remove('empty-state');
-    coachNote.textContent = 'If the key is invalid or rate limited, new requests will fail until it is fixed.';
-    coachNote.classList.remove('empty-state');
-    setStatus('Request failed.');
-  } finally {
-    sendBtn.disabled = false;
-  }
-}
-
-function renderMessages() {
-  const items = state.messages.map((message) => {
-    const roleLabel = message.role === 'user' ? 'You' : 'Coach';
-    return `
-      <div class="message ${message.role}">
-        <span class="meta">${roleLabel}</span>
-        <div>${message.text}</div>
-      </div>
-    `;
-  }).join('');
-
-  chatMessages.innerHTML = items || '<div class="message ai"><span class="meta">Coach</span><div>Hello! Let’s practice English together. Ask me anything.</div></div>';
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function startRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    setStatus('Your browser does not support speech recognition.');
-    return;
-  }
-
-  if (!state.recognition) {
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-      }
-      userInput.value = transcript;
-    };
-
-    recognition.onend = () => {
-      state.isListening = false;
-      voiceBtn.textContent = '🎤';
-    };
-
-    recognition.onerror = () => {
-      state.isListening = false;
-      voiceBtn.textContent = '🎤';
-      setStatus('Microphone error. Please try again.');
-    };
-
-    state.recognition = recognition;
-  }
-
-  if (state.isListening) {
-    state.recognition.stop();
-    state.isListening = false;
-    voiceBtn.textContent = '🎤';
-    return;
-  }
-
-  state.recognition.start();
-  state.isListening = true;
-  voiceBtn.textContent = '🛑';
-  setStatus('Listening...');
-}
-
-function speakLatestReply() {
-  if (!state.latestReply) {
-    setStatus('No AI reply yet.');
-    return;
-  }
-
-  if (!('speechSynthesis' in window)) {
-    setStatus('Your browser does not support speech synthesis.');
-    return;
-  }
-
-  const utterance = new SpeechSynthesisUtterance(state.latestReply);
-  utterance.lang = 'en-US';
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utterance);
-  setStatus('Reading the latest reply aloud...');
-}
-
-function handleQuickPrompt(event) {
-  const prompt = event.currentTarget.dataset.prompt;
-  if (prompt) {
-    userInput.value = prompt;
-    userInput.focus();
-  }
-}
-
-function toggleTheme() {
-  document.body.classList.toggle('dark');
-  saveSettings();
-}
-
-function newChat() {
-  state.messages = [];
-  state.latestReply = '';
-  correctionBox.textContent = 'AI corrections will appear here.';
-  correctionBox.classList.add('empty-state');
-  coachNote.textContent = 'Your teacher feedback will appear here.';
-  coachNote.classList.add('empty-state');
-  renderMessages();
-  setStatus('New chat started.');
-}
-
-saveKeyBtn.addEventListener('click', saveApiKey);
-clearKeyBtn.addEventListener('click', clearApiKey);
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-voiceBtn.addEventListener('click', startRecognition);
-speakReplyBtn.addEventListener('click', speakLatestReply);
-scenarioSelect.addEventListener('change', saveSettings);
-modelSelect.addEventListener('change', saveSettings);
-themeToggle.addEventListener('click', toggleTheme);
-newChatBtn.addEventListener('click', newChat);
-document.querySelectorAll('.prompt-chip').forEach((chip) => chip.addEventListener('click', handleQuickPrompt));
-
-showApiKey();
-loadSettings();
-renderMessages();
+- `index.html` — 網頁結構
+- `style.css` — 版面與樣式
+- `app.js` — 對話、Gemini API、語音及瀏覽器設定

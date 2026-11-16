@@ -3,113 +3,101 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat in English</title>
+    <meta name="theme-color" content="#f6f7fb" />
+    <title>Chat in English — Practice with AI</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">AI Conversation Practice</p>
-          <h1>Chat in English</h1>
-        </div>
-        <button id="themeToggle" class="ghost-button" aria-label="Toggle theme">
-          🌙
-        </button>
+        <a class="brand" href="./" aria-label="Chat in English home">
+          <span class="brand-icon" aria-hidden="true">A</span>
+          <span>English <span class="brand-light">Practice</span></span>
+        </a>
+        <button id="themeToggle" class="icon-button theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">☾</button>
       </header>
 
-      <section class="settings-panel card">
+      <section class="intro">
+        <p class="eyebrow">A little practice, a lot more confidence</p>
+        <h1>Let’s talk in <span>English.</span></h1>
+        <p class="intro-copy">Choose a situation, say what you mean, and get friendly feedback as you go.</p>
+      </section>
+
+      <section class="settings-panel card" aria-label="Practice settings">
         <div class="api-box">
-          <label for="apiKeyInput">Gemini API Key</label>
+          <div class="section-heading">
+            <div><span class="step-number">1</span><label for="apiKeyInput">Connect your Gemini key</label></div>
+            <span class="private-note">🔒 Saved only in this browser</span>
+          </div>
           <div class="api-row">
-            <input
-              id="apiKeyInput"
-              type="password"
-              placeholder="Paste your Gemini API key here"
-              autocomplete="off"
-            />
-            <button id="saveKeyBtn" class="primary-button">Save</button>
-            <button id="clearKeyBtn" class="ghost-button">Clear</button>
+            <input id="apiKeyInput" type="password" placeholder="Paste your Gemini API key" autocomplete="off" />
+            <button id="saveKeyBtn" class="primary-button" type="button">Save key</button>
+            <button id="clearKeyBtn" class="ghost-button" type="button">Clear</button>
           </div>
           <div class="helper-row">
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
-              Get free API key
-            </a>
-            <span>Use your own key in browser storage only. No secret is committed to GitHub.</span>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get a Gemini API key ↗</a>
+            <span>Your key is sent to Google to generate replies; it is not included in this project.</span>
           </div>
         </div>
 
         <div class="option-grid">
           <div class="field-group">
-            <label for="modelSelect">Model</label>
-            <select id="modelSelect">
-              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-              <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
-              <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            <label for="scenarioSelect"><span class="step-number">2</span> Choose a roleplay</label>
+            <select id="scenarioSelect">
+              <option value="daily-life">☕ Everyday conversation</option>
+              <option value="restaurant">🍽️ At a restaurant</option>
+              <option value="hotel">🏨 Checking into a hotel</option>
+              <option value="job-interview">💼 Job interview</option>
             </select>
           </div>
-
           <div class="field-group">
-            <label for="scenarioSelect">Practice scenario</label>
-            <select id="scenarioSelect">
-              <option value="daily-life">Daily life</option>
-              <option value="coffee-shop">Coffee shop</option>
-              <option value="travel">Travel</option>
-              <option value="job-interview">Job interview</option>
-              <option value="classroom">Classroom speaking</option>
+            <label for="modelSelect">Gemini model</label>
+            <select id="modelSelect">
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
             </select>
           </div>
         </div>
       </section>
 
       <main class="workspace">
-        <section class="card chat-panel">
+        <section class="card chat-panel" aria-label="English conversation">
           <div class="chat-header">
-            <h2>Conversation</h2>
-            <button id="newChatBtn" class="ghost-button">New chat</button>
+            <div><span class="live-dot"></span><h2>Practice conversation</h2></div>
+            <button id="newChatBtn" class="ghost-button" type="button">↻ New chat</button>
           </div>
-
-          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
-
-          <div class="quick-prompts">
-            <button class="prompt-chip" data-prompt="Can you help me improve my English speaking?">Speak naturally</button>
-            <button class="prompt-chip" data-prompt="Give me a polite way to say this in English.">Polite phrase</button>
-            <button class="prompt-chip" data-prompt="Ask me questions to practice speaking like a native speaker.">Practice speaking</button>
+          <div id="chatMessages" class="chat-messages" aria-live="polite" aria-relevant="additions"></div>
+          <div class="quick-prompts" aria-label="Quick prompts">
+            <button class="prompt-chip" type="button" data-prompt="Hi! Can we practice a conversation?">Start chatting</button>
+            <button class="prompt-chip" type="button" data-prompt="Could you ask me a question?">Ask me a question</button>
+            <button class="prompt-chip" type="button" data-prompt="How can I say this more naturally?">Help me sound natural</button>
           </div>
-
-          <div class="composer">
-            <textarea id="userInput" rows="1" placeholder="Type your sentence in English..."></textarea>
+          <form id="chatForm" class="composer">
+            <textarea id="userInput" rows="1" placeholder="Type in English… (Enter to send)" aria-label="Your message"></textarea>
             <div class="composer-actions">
-              <button id="voiceBtn" class="icon-button" title="Use microphone">🎤</button>
-              <button id="sendBtn" class="primary-button">Send</button>
+              <button id="voiceBtn" class="icon-button mic-button" type="button" title="Speak in English" aria-label="Speak in English">🎙</button>
+              <button id="sendBtn" class="send-button" type="submit">Send <span aria-hidden="true">↑</span></button>
             </div>
-          </div>
+          </form>
+          <p class="voice-hint">🎙 You can type or use your microphone. Voice recognition depends on browser support.</p>
         </section>
 
-        <aside class="card side-panel">
-          <div class="side-section">
-            <h3>Correction</h3>
-            <div id="correctionBox" class="correction-box empty-state">
-              AI corrections will appear here.
-            </div>
-          </div>
-
-          <div class="side-section">
-            <h3>Coach Note</h3>
-            <div id="coachNote" class="coach-note empty-state">
-              Your teacher feedback will appear here.
-            </div>
-          </div>
-
-          <div class="side-section">
-            <h3>Voice</h3>
-            <button id="speakReplyBtn" class="secondary-button">Read the latest reply aloud</button>
-            <p class="microcopy">Recommended browser: Chrome, Edge, or Safari for the best voice recognition.</p>
-          </div>
+        <aside class="side-panel">
+          <section class="card feedback-card">
+            <div class="card-title"><span class="title-icon correction-icon">✓</span><div><h3>Your English</h3><p>Quick, friendly correction</p></div></div>
+            <div id="correctionBox" class="correction-box empty-state">Your improved sentence will appear here after you send a message.</div>
+            <button id="speakCorrectionBtn" class="replay-button" type="button" disabled>▶ Replay corrected sentence</button>
+          </section>
+          <section class="card feedback-card coach-card">
+            <div class="card-title"><span class="title-icon coach-icon">✦</span><div><h3>Coach’s note</h3><p>A small tip to remember</p></div></div>
+            <div id="coachNote" class="coach-note empty-state">Tips about grammar, vocabulary, and natural phrasing will show up here.</div>
+          </section>
+          <div class="privacy-note"><span>💡</span><p>Your API key belongs to you. Clear it from this page whenever you want.</p></div>
         </aside>
       </main>
+      <footer>Made for learners, one conversation at a time.</footer>
     </div>
-
     <script src="app.js"></script>
   </body>
 </html>
