@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'chat_in_english_api_key';
 const SETTINGS_KEY = 'chat_in_english_settings';
+const GEMINI_INTERACTIONS_URL = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 
 const apiKeyInput = document.getElementById('apiKeyInput');
 const modelSelect = document.getElementById('modelSelect');
@@ -136,6 +137,16 @@ function parseResponse(text) {
   }
 }
 
+function extractInteractionText(payload) {
+  if (typeof payload?.output_text === 'string' && payload.output_text.trim()) return payload.output_text;
+  const output = Array.isArray(payload?.output) ? payload.output : [];
+  return output.flatMap((item) => {
+    if (typeof item?.text === 'string') return [item.text];
+    if (Array.isArray(item?.content)) return item.content.map((part) => part?.text || '').filter(Boolean);
+    return [];
+  }).join('\n').trim();
+}
+
 async function sendMessage(event) {
   event?.preventDefault();
   const text = userInput.value.trim();
@@ -155,24 +166,24 @@ async function sendMessage(event) {
   sendBtn.disabled = true;
   setStatus('Thinking…');
 
-  const contents = history.slice(-16).map((message) => ({
-    role: message.role === 'ai' ? 'model' : 'user',
-    parts: [{ text: message.text }],
-  }));
+  const conversation = history.slice(-16).map((message) => `${message.role === 'ai' ? 'Coach' : 'Learner'}: ${message.text}`).join('\n');
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelSelect.value)}:generateContent?key=${encodeURIComponent(state.apiKey)}`, {
+    const response = await fetch(GEMINI_INTERACTIONS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': state.apiKey,
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: getSystemInstruction() }] },
-        contents,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 450, responseMimeType: 'application/json' },
+        model: modelSelect.value,
+        input: conversation,
+        system_instruction: getSystemInstruction(),
       }),
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload?.error?.message || `Request failed (${response.status}).`);
-    const raw = payload?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '';
+    const raw = extractInteractionText(payload);
     if (!raw) throw new Error('Gemini returned an empty reply. Try again.');
     const result = parseResponse(raw);
     state.messages.push({ role: 'ai', text: result.response });

@@ -6,8 +6,6 @@
 
 部署完成後，開啟：**https://yiiihsuann.github.io/chat_in_english/**
 
-如果網址尚未開啟，請先照下方「部署到 GitHub Pages」設定；首次部署通常需要幾分鐘才會生效。
-
 1. 到 [Google AI Studio](https://aistudio.google.com/app/apikey) 取得自己的 Gemini API Key。
 2. 開啟練習網站，把 Key 貼到頁面上方並按 **Save key**。
 3. 選一個角色扮演情境，例如餐廳、飯店或工作面試。
@@ -26,8 +24,9 @@
 
 ## 功能
 
-- Gemini AI 英文對話與友善的英文修正
+- Gemini 3.8 Flash 對話，使用 Google Gemini Interactions API
 - Everyday、餐廳、飯店入住、工作面試角色扮演
+- AI 提供英文修正與簡短說明
 - 每則 AI 回覆可單獨重播；修正句也可重播
 - 瀏覽器語音輸入與深色模式
 - API Key 由每位使用者自行提供，存在該瀏覽器的 `localStorage`
@@ -35,7 +34,7 @@
 
 ## API Key 與隱私
 
-這是純前端網站，沒有自建後端。Key 不在程式碼或 GitHub repository 中，但會由使用者瀏覽器直接送到 Google Gemini API，並儲存在同一瀏覽器的 `localStorage`。請只在自己的裝置使用自己的 Key；不要共用或公開 Key。使用公用電腦後，請按 **Clear**。API 使用量及相關限制依 Google AI Studio 帳戶與方案為準。
+這是純前端網站，沒有自建後端。Key 不在程式碼或 GitHub repository 中，但會由使用者瀏覽器透過 HTTPS 請求直接送到 Google Gemini API，並儲存在同一瀏覽器的 `localStorage`。請只在自己的裝置使用自己的 Key；不要共用或公開 Key。使用公用電腦後，請按 **Clear**。API 使用量及相關限制依 Google AI Studio 帳戶與方案為準。
 
 ## 語音支援
 
