@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat in English</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">AI Conversation Practice</p>
+          <h1>Chat in English</h1>
+        </div>
+        <button id="themeToggle" class="ghost-button" aria-label="Toggle theme">
+          🌙
+        </button>
+      </header>
+
+      <section class="settings-panel card">
+        <div class="api-box">
+          <label for="apiKeyInput">Gemini API Key</label>
+          <div class="api-row">
+            <input
+              id="apiKeyInput"
+              type="password"
+              placeholder="Paste your Gemini API key here"
+              autocomplete="off"
+            />
+            <button id="saveKeyBtn" class="primary-button">Save</button>
+            <button id="clearKeyBtn" class="ghost-button">Clear</button>
+          </div>
+          <div class="helper-row">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
+              Get free API key
+            </a>
+            <span>Use your own key in browser storage only. No secret is committed to GitHub.</span>
+          </div>
+        </div>
+
+        <div class="option-grid">
+          <div class="field-group">
+            <label for="modelSelect">Model</label>
+            <select id="modelSelect">
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="scenarioSelect">Practice scenario</label>
+            <select id="scenarioSelect">
+              <option value="daily-life">Daily life</option>
+              <option value="coffee-shop">Coffee shop</option>
+              <option value="travel">Travel</option>
+              <option value="job-interview">Job interview</option>
+              <option value="classroom">Classroom speaking</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <main class="workspace">
+        <section class="card chat-panel">
+          <div class="chat-header">
+            <h2>Conversation</h2>
+            <button id="newChatBtn" class="ghost-button">New chat</button>
+          </div>
+
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+
+          <div class="quick-prompts">
+            <button class="prompt-chip" data-prompt="Can you help me improve my English speaking?">Speak naturally</button>
+            <button class="prompt-chip" data-prompt="Give me a polite way to say this in English.">Polite phrase</button>
+            <button class="prompt-chip" data-prompt="Ask me questions to practice speaking like a native speaker.">Practice speaking</button>
+          </div>
+
+          <div class="composer">
+            <textarea id="userInput" rows="1" placeholder="Type your sentence in English..."></textarea>
+            <div class="composer-actions">
+              <button id="voiceBtn" class="icon-button" title="Use microphone">🎤</button>
+              <button id="sendBtn" class="primary-button">Send</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="card side-panel">
+          <div class="side-section">
+            <h3>Correction</h3>
+            <div id="correctionBox" class="correction-box empty-state">
+              AI corrections will appear here.
+            </div>
+          </div>
+
+          <div class="side-section">
+            <h3>Coach Note</h3>
+            <div id="coachNote" class="coach-note empty-state">
+              Your teacher feedback will appear here.
+            </div>
+          </div>
+
+          <div class="side-section">
+            <h3>Voice</h3>
+            <button id="speakReplyBtn" class="secondary-button">Read the latest reply aloud</button>
+            <p class="microcopy">Recommended browser: Chrome, Edge, or Safari for the best voice recognition.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
